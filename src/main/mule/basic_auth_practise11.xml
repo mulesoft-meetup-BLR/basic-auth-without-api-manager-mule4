@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:oauth2-provider="http://www.mulesoft.org/schema/mule/oauth2-provider"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/oauth2-provider http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9eec3234-c1b2-4924-976c-dcd93fec9893" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<spring:config name="Spring_Config" doc:name="Spring Config" doc:id="1f5e18a0-f923-4878-8313-152b96d6163e" files="basicauth.xml" />
+	<spring:security-manager doc:name="Spring Security manager" doc:id="6a7a4c5c-af4f-49ef-a177-d560b927d225" >
+		<spring:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager" />
+	</spring:security-manager>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b34cd106-9049-4343-996b-250e888226c8" basePath="/api" >
+		<http:request-connection host="worldclockapi.com" />
+	</http:request-config>
+	<api-gateway:autodiscovery apiId="16894263" doc:name="API Autodiscovery" doc:id="3c552548-d1a3-4bbe-9713-1f6bb977cb0c" flowRef="basic_auth_practise11Flow1" />
+	<flow name="basic_auth_practise11Flow" doc:id="58a6babb-04d8-4052-aa76-1eefcf1bb8da" >
+		<http:listener doc:name="Listener" doc:id="a0a2cccd-2600-4f46-86d9-b69558c2b6a4" config-ref="HTTP_Listener_config" path="/basicauth/simple"/>
+		<http:basic-security-filter doc:name="Basic security filter" doc:id="8a86acb5-c90d-4cd4-84b8-46d013205964" realm="mule"/>
+		<spring:authorization-filter doc:name="Authorization filter" doc:id="f790272f-7806-4f66-8c1c-9202d2266517" requiredAuthorities="ROLE_ADMIN" />
+		<http:request method="GET" doc:name="WorldClockRequest" doc:id="c2634e94-31f1-4910-ad3f-270605991bc6" config-ref="HTTP_Request_configuration" path="/json/est/now" />
+		<logger level="INFO" doc:name="Logger" doc:id="4ae93ac1-034e-49de-bdb7-3949ad235922" message="Passed Successfully" />
+	</flow>
+	<flow name="basic_auth_practise11Flow1" doc:id="76681486-5d62-4580-807d-349410df4238" >
+		<http:listener doc:name="Listener" doc:id="533d7cbc-bef1-4e67-92ac-c2057e144668" config-ref="HTTP_Listener_config" path="/basicauth/withapimanager"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ba28748b-46d1-4e7a-901c-0f0b481ad8e1" message="Before request"/>
+		<http:request method="GET" doc:name="WorldClockRequest" doc:id="9dab2c8b-4290-49bb-bf33-03339ad4785c" config-ref="HTTP_Request_configuration" path="/json/est/now" />
+		<logger level="INFO" doc:name="Logger" doc:id="408b25b9-a0f9-4a34-b1c3-4f011277ecdb" message="After request"/>
+	</flow>
+</mule>
